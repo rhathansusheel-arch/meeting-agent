@@ -27,6 +27,9 @@ load_dotenv(BASE_DIR / ".env")
 
 TELEGRAM_BOT_TOKEN = os.getenv("TELEGRAM_BOT_TOKEN", "")
 
+# Free Google Gemini API key (from https://aistudio.google.com/apikey).
+GEMINI_API_KEY = os.getenv("GEMINI_API_KEY", "")
+
 # Your Telegram chat ID(s). Stored as text in .env (one id, or several separated
 # by commas/spaces). We turn them into a list of numbers here.
 _owner_raw = os.getenv("OWNER_CHAT_ID", "")
@@ -74,6 +77,18 @@ WORK_DAYS = [0, 1, 2, 3, 4, 5]
 
 # Which Google calendar to use. "primary" means your main calendar.
 CALENDAR_ID = "primary"
+
+# ----------------------------------------------------------------------
+# Gemini (AI message understanding)
+# ----------------------------------------------------------------------
+
+# Which Gemini model to use. Must be a free-tier, non-preview model.
+# "gemini-3.5-flash-lite" was confirmed working on the free tier. You can change
+# this if Google updates their model names (see https://ai.google.dev/gemini-api/docs/models).
+GEMINI_MODEL = os.getenv("GEMINI_MODEL") or "gemini-3.5-flash-lite"
+
+# How long to wait for Gemini before giving up and using the basic parser (seconds).
+GEMINI_TIMEOUT_SECONDS = 20
 
 
 # ======================================================================

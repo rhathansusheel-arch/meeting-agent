@@ -3,10 +3,13 @@
 A private Telegram bot that books Google Calendar meetings for you.
 
 You message the bot in plain language (e.g. *"Meeting with Rahul, rahul@gmail.com,
-tomorrow 4pm"*). It reads the details using simple text rules (a regex for the email
-and the `dateparser` library for the date/time), checks your calendar for conflicts,
-shows you a summary to confirm, then creates a Google Calendar event with a Google
-Meet link and emails the customer an invite.
+tomorrow 4pm"*). It understands the details using Google's FREE Gemini AI, checks
+your calendar for conflicts, shows you a summary to confirm, then creates a Google
+Calendar event with a Google Meet link and emails the customer an invite.
+
+If Gemini is ever unavailable (no internet, rate limit, bad key, timeout), the bot
+automatically falls back to a built-in rule-based parser and tells you
+*"AI unavailable, used basic parsing."* It never crashes or goes silent.
 
 **Only you can use the bot.** It ignores everyone else.
 
@@ -18,7 +21,8 @@ Meet link and emails the customer an invite.
 |------|--------------|
 | `bot.py` | The Telegram bot: conversation, buttons, booking flow. |
 | `calendar_service.py` | Talks to Google Calendar: login, conflict check, create events, list upcoming. |
-| `message_parser.py` | Reads your messages with regexes + `dateparser` (no AI). |
+| `gemini_parser.py` | Understands your messages with the free Google Gemini AI. |
+| `message_parser.py` | Fallback parser: regexes + `dateparser` (used if Gemini is down). |
 | `config.py` | Your settings (working hours, timezone, default length). Reads secrets from `.env`. |
 | `.env` | Your secret keys. **Never shared, never committed.** |
 | `.env.example` | Template showing which keys are needed. |
@@ -49,6 +53,7 @@ Secret files kept out of git by `.gitignore`: `.env`, `credentials.json`, `token
 - `DEFAULT_MEETING_MINUTES` - default `30`
 - `WORK_START_HOUR` / `WORK_END_HOUR` - default `10`-`19`
 - `WORK_DAYS` - default Monday-Saturday (`0`-`5`)
+- `GEMINI_MODEL` - the Gemini model used for understanding messages (default `gemini-3.5-flash-lite`, free tier)
 
 ---
 

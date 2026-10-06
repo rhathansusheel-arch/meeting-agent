@@ -37,6 +37,7 @@ from telegram.ext import (
 
 import calendar_service
 import config
+import gemini_parser
 from calendar_service import CalendarError
 from message_parser import TZ, ParsedMeeting, format_duration, merge, parse_message
 
@@ -80,6 +81,28 @@ async def get_service(context: ContextTypes.DEFAULT_TYPE):
         service = await asyncio.to_thread(calendar_service.get_calendar_service)
         context.application.bot_data["calendar_service"] = service
     return service
+
+
+# ----------------------------------------------------------------------
+# Understanding a message: try Gemini (AI) first, fall back to basic parsing
+# ----------------------------------------------------------------------
+
+async def parse_incoming(text, now):
+    """
+    Return (ParsedMeeting, source) where source is "gemini" or "fallback".
+    Never raises: if Gemini fails for any reason, we use the rule-based parser.
+    A hard timeout guarantees it can't hang.
+    """
+    try:
+        meeting = await asyncio.wait_for(
+            asyncio.to_thread(gemini_parser.parse_with_gemini, text, now),
+            timeout=config.GEMINI_TIMEOUT_SECONDS + 5,
+        )
+        logger.info("Message understood via Gemini")
+        return meeting, "gemini"
+    except Exception as error:
+        logger.warning("Gemini unavailable (%s); using basic parser", type(error).__name__)
+        return parse_message(text, now), "fallback"
 
 
 # ----------------------------------------------------------------------
@@ -285,7 +308,10 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
         return await reject_stranger(update)
 
     text = update.message.text or ""
-    new = parse_message(text)
+    now = datetime.now(TZ)
+    new, source = await parse_incoming(text, now)
+    if source == "fallback":
+        await update.message.reply_text("AI unavailable, used basic parsing.")
 
     # Decide: is this a reply to a question we asked, or a brand-new booking?
     # We only keep old data if we were waiting for a specific piece AND this message
