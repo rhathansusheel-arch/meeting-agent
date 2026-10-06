@@ -1,0 +1,16 @@
+# Telegram bot (async version)
+python-telegram-bot>=21.0
+
+# Google Calendar + OAuth login with your own Google account
+google-api-python-client>=2.100.0
+google-auth-oauthlib>=1.2.0
+google-auth-httplib2>=0.2.0
+
+# Understands dates/times written in plain language ("tomorrow 4pm", "next Friday")
+dateparser>=1.2.0
+
+# Loads secrets from the .env file
+python-dotenv>=1.0.0
+
+# Timezone data (needed so "Asia/Kolkata" works on Windows)
+tzdata>=2024.1

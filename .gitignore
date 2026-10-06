@@ -1,0 +1,21 @@
+# Secrets and credentials — NEVER commit these
+.env
+credentials.json
+token.json
+
+# Python virtual environment
+.venv/
+venv/
+
+# Python cache
+__pycache__/
+*.pyc
+
+# Logs
+*.log
+
+# Editor / OS junk
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
